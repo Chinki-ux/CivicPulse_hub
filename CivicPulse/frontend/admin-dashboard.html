@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CivicPulse Hub</title>
+    <link rel="stylesheet" href="admin-dashboard.css">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">🏙️ CivicPulse Hub</div>
+                <div class="user-role admin">Admin Portal</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-link active" data-section="overview">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Overview</span>
+                </a>
+                <a href="#verify" class="nav-link" data-section="verify">
+                    <span class="nav-icon">✅</span>
+                    <span class="nav-text">Verify Reports</span>
+                    <span class="badge-count" id="pendingVerificationCount">0</span>
+                </a>
+                <a href="#all-reports" class="nav-link" data-section="all-reports">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">All Reports</span>
+                </a>
+                <a href="#assign" class="nav-link" data-section="assign">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Assign Reports</span>
+                </a>
+                <a href="#users" class="nav-link" data-section="users">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">Manage Users</span>
+                </a>
+                <a href="#officers" class="nav-link" data-section="officers">
+                    <span class="nav-icon">👮</span>
+                    <span class="nav-text">Manage Officers</span>
+                </a>
+                <a href="#analytics" class="nav-link" data-section="analytics">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="#settings" class="nav-link" data-section="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <span>🚪</span> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="welcome-section">
+                    <h1>Welcome, Admin!</h1>
+                    <p>Complete system overview and management</p>
+                </div>
+                <div class="admin-actions">
+                    <button class="btn btn-secondary" id="exportDataBtn">📥 Export Data</button>
+                    <button class="btn btn-primary" id="generateReportBtn">📊 Generate Report</button>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <section id="overview-section" class="content-section active">
+                <div class="section-title">
+                    <h2>System Overview</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-content">
+                            <h3 id="totalSystemReports">0</h3>
+                            <p>Total Reports</p>
+                        </div>
+                    </div>
+                    <div class="stat-card yellow">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-content">
+                            <h3 id="systemPending">0</h3>
+                            <p>Pending Verification</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon">🔧</div>
+                        <div class="stat-content">
+                            <h3 id="systemInProgress">0</h3>
+                            <p>In Progress</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <h3 id="systemResolved">0</h3>
+                            <p>Resolved</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-sections">
+                    <div class="dashboard-card">
+                        <h3>🚨 Pending Verification</h3>
+                        <div id="pendingVerificationList" class="reports-list">
+                            <div class="loading-message">Loading pending verifications...</div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3>📈 Today's Activity</h3>
+                        <div class="activity-stats">
+                            <div class="activity-item">
+                                <span>New Reports:</span>
+                                <strong id="todayNewReports">0</strong>
+                            </div>
+                            <div class="activity-item">
+                                <span>Verified:</span>
+                                <strong id="todayVerified">0</strong>
+                            </div>
+                            <div class="activity-item">
+                                <span>Resolved:</span>
+                                <strong id="todayResolved">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid" style="margin-top: 25px;">
+                    <div class="stat-card purple">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card teal">
+                        <div class="stat-icon">👮</div>
+                        <div class="stat-content">
+                            <h3 id="totalOfficers">0</h3>
+                            <p>Active Officers</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Verify Reports Section -->
+            <section id="verify-section" class="content-section">
+                <div class="section-title">
+                    <h2>✅ Verify Grievance Reports</h2>
+                    <p>Review and verify submitted grievances before assignment</p>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="verifySearchReports" placeholder="Search by ID, location, category...">
+                    <select id="verifyCategoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="Road">Road & Infrastructure</option>
+                        <option value="Water">Water Supply</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Sanitation">Sanitation & Waste</option>
+                        <option value="Street Light">Street Lighting</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="loadPendingVerification()">🔄 Refresh</button>
+                </div>
+
+                <div id="verificationReportsList" class="verification-grid">
+                    <div class="loading-message">Loading reports for verification...</div>
+                </div>
+            </section>
+
+            <!-- All Reports Section -->
+            <section id="all-reports-section" class="content-section">
+                <div class="section-title">
+                    <h2>📋 All System Reports</h2>
+                    <p>View and manage all civic reports</p>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="adminSearchReports" placeholder="Search by ID, citizen name, location...">
+                    <select id="adminStatusFilter">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="verified">Verified</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <select id="adminCategoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="Road">Road & Infrastructure</option>
+                        <option value="Water">Water Supply</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Sanitation">Sanitation & Waste</option>
+                        <option value="Street Light">Street Lighting</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div id="adminReportsList" class="reports-grid">
+                    <div class="loading-message">Loading all reports...</div>
+                </div>
+            </section>
+
+            <!-- Assign Reports Section -->
+            <section id="assign-section" class="content-section">
+                <div class="section-title">
+                    <h2>👥 Assign Reports to Officers</h2>
+                    <p>Distribute workload efficiently across your team</p>
+                </div>
+
+                <div class="assign-container">
+                    <div class="form-container">
+                        <form id="assignReportForm">
+                            <div class="form-group">
+                                <label for="assignReportId">Report ID *</label>
+                                <input type="text" id="assignReportId" placeholder="Enter Report ID" required>
+                                <button type="button" class="btn btn-secondary" id="loadReportBtn">Load Report</button>
+                            </div>
+
+                            <div id="assignReportDetails" class="report-details" style="display: none;">
+                                <h4>Report Details</h4>
+                                <p id="assignReportInfo"></p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="assignOfficer">Assign to Officer *</label>
+                                <select id="assignOfficer" required>
+                                    <option value="">Select Officer</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="assignPriority">Priority Level *</label>
+                                <select id="assignPriority" required>
+                                    <option value="">Select Priority</option>
+                                    <option value="urgent">🔴 Urgent</option>
+                                    <option value="high">🟠 High</option>
+                                    <option value="medium">🟡 Medium</option>
+                                    <option value="low">🟢 Low</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="assignNotes">Assignment Notes</label>
+                                <textarea id="assignNotes" rows="3" placeholder="Add any special instructions..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-large">Assign Report</button>
+                        </form>
+                    </div>
+
+                    <div class="officer-workload">
+                        <h3>Officer Workload</h3>
+                        <div id="officerWorkloadList" class="workload-list">
+                            <div class="loading-message">Loading workload...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Manage Users Section -->
+            <section id="users-section" class="content-section">
+                <div class="section-title">
+                    <h2>👤 Manage Citizens</h2>
+                    <p>View and manage citizen accounts</p>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="searchUsers" placeholder="Search users by name or email...">
+                    <button class="btn btn-secondary" id="addUserBtn">+ Add New User</button>
+                </div>
+
+                <div id="usersList" class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Reports</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr><td colspan="7" class="loading-message">Loading users...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Manage Officers Section -->
+            <section id="officers-section" class="content-section">
+                <div class="section-title">
+                    <h2>👮 Manage Officers</h2>
+                    <p>View and manage government officer accounts</p>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="searchOfficers" placeholder="Search officers by name or department...">
+                    <button class="btn btn-secondary" id="addOfficerBtn">+ Add New Officer</button>
+                </div>
+
+                <div id="officersList" class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Assigned</th>
+                                <th>Resolved</th>
+                                <th>Rating</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="officersTableBody">
+                            <tr><td colspan="8" class="loading-message">Loading officers...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics-section" class="content-section">
+                <div class="section-title">
+                    <h2>📈 System Analytics</h2>
+                    <p>Comprehensive insights and trends</p>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Reports by Category</h3>
+                        <div id="categoryChart" class="chart-placeholder">
+                            <p>📊 Loading chart...</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Response Time Analysis</h3>
+                        <div class="metrics-list">
+                            <div class="metric-item">
+                                <span>Average Response Time:</span>
+                                <strong id="avgResponseTime">2.5 days</strong>
+                            </div>
+                            <div class="metric-item">
+                                <span>Average Resolution Time:</span>
+                                <strong id="avgResTime">7.2 days</strong>
+                            </div>
+                            <div class="metric-item">
+                                <span>Fastest Resolution:</span>
+                                <strong id="fastestRes">4 hours</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Department Performance</h3>
+                        <div id="departmentPerformance" class="performance-list">
+                            <div class="loading-message">Loading performance...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="content-section">
+                <div class="section-title">
+                    <h2>⚙️ System Settings</h2>
+                    <p>Configure system parameters and preferences</p>
+                </div>
+
+                <div class="settings-container">
+                    <div class="settings-card">
+                        <h3>Notification Settings</h3>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="emailNotif" checked> Email notifications for new reports
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="smsNotif" checked> SMS alerts for urgent issues
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="dailySummary"> Daily summary reports
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>System Preferences</h3>
+                        <div class="setting-item">
+                            <label for="autoAssign">Auto-assign reports:</label>
+                            <select id="autoAssign">
+                                <option value="off">Off</option>
+                                <option value="balanced">Balanced Workload</option>
+                                <option value="category">By Category</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label for="priorityThreshold">Urgent priority threshold (days):</label>
+                            <input type="number" id="priorityThreshold" value="3" min="1" max="30">
+                        </div>
+                        <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>Data Management</h3>
+                        <button class="btn btn-secondary" id="exportAllBtn">📥 Export All Data</button>
+                        <button class="btn btn-secondary" id="backupBtn" style="margin-top: 10px;">🗄️ Backup Database</button>
+                        <button class="btn btn-danger" id="clearOldBtn" style="margin-top: 10px;">🗑️ Clear Old Records</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Verification Modal -->
+    <div id="verificationModal" class="modal">
+        <div class="modal-content verification-modal">
+            <span class="close-modal" onclick="closeVerificationModal()">&times;</span>
+            
+            <h2>🔍 Verify Grievance Report</h2>
+            
+            <div class="verification-details">
+                <div class="verification-left">
+                    <div class="detail-group">
+                        <h3>Report Information</h3>
+                        <div class="detail-item">
+                            <strong>Report ID:</strong>
+                            <span id="modalReportId">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Title:</strong>
+                            <span id="modalTitle">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Category:</strong>
+                            <span id="modalCategory">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Location:</strong>
+                            <span id="modalLocation">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Submitted:</strong>
+                            <span id="modalDate">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Citizen:</strong>
+                            <span id="modalCitizen">-</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-group">
+                        <h3>Description</h3>
+                        <p id="modalDescription" class="description-text">-</p>
+                    </div>
+
+                    <div class="detail-group">
+                        <h3>Decision</h3>
+                        <div class="form-group">
+                            <label for="verificationReason">Reason / Comments</label>
+                            <textarea id="verificationReason" rows="3" placeholder="Add reason for approval or rejection..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="verification-right">
+                    <div class="detail-group">
+                        <h3>Attached Image</h3>
+                        <div id="modalImageContainer" class="image-container">
+                            <img id="modalImage" src="" alt="Grievance Image">
+                            <p id="noImageText" style="display: none;">No image attached</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-danger btn-large" onclick="rejectGrievance()">
+                    ❌ Reject Report
+                </button>
+                <button class="btn btn-success btn-large" onclick="approveGrievance()">
+                    ✅ Approve Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-dashboard.js"></script>
+</body>
+</html>

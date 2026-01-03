@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicPulse Hub - Smart City Feedback System</title>
+    <link rel="stylesheet" href="homepage-styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                🏙️ CivicPulse Hub
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="signin.html" class="btn-nav btn-signin">Sign In</a></li>
+                <li><a href="signup.html" class="btn-nav btn-signup">Sign Up</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>CivicPulse Hub</h1>
+            <p class="subtitle">Unified Smart City Feedback & Redressal System</p>
+            <p class="description">Empowering citizens to report issues, track progress, and build smarter cities together through seamless collaboration and transparency</p>
+            <div class="cta-buttons">
+                <button class="btn btn-primary" onclick="checkLoginAndReport()">🚀 Report an Issue</button>
+                <button class="btn btn-secondary" onclick="checkLoginAndTrack()">🔍 Track Status</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>Powerful Features</h2>
+            <p>Everything you need for efficient civic engagement and issue resolution</p>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>Easy Reporting</h3>
+                <p>Submit civic issues with photos, precise location data, and detailed descriptions in just a few clicks</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Real-Time Tracking</h3>
+                <p>Monitor your complaint journey from submission through acknowledgment to final resolution with live updates</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔔</div>
+                <h3>Smart Notifications</h3>
+                <p>Receive instant alerts via SMS and email when your issue status changes or requires attention</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🗺️</div>
+                <h3>Location Intelligence</h3>
+                <p>Interactive maps showing all issues in your area with heat maps and neighborhood improvement tracking</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3>Analytics Dashboard</h3>
+                <p>Comprehensive insights into city-wide trends, response times, and departmental performance metrics</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <h3>Citizen Engagement</h3>
+                <p>Vote on issue priorities, collaborate with neighbors, and participate in community-driven solutions</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <h3 id="totalReports">1,247</h3>
+                <p>Issues Reported</p>
+            </div>
+            <div class="stat-item">
+                <h3 id="resolvedReports">985</h3>
+                <p>Issues Resolved</p>
+            </div>
+            <div class="stat-item">
+                <h3 id="resolutionRate">79%</h3>
+                <p>Resolution Rate</p>
+            </div>
+            <div class="stat-item">
+                <h3 id="activeCitizens">543</h3>
+                <p>Active Citizens</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="section-header">
+            <h2>About CivicPulse Hub</h2>
+            <p>Building bridges between citizens and civic authorities</p>
+        </div>
+        <div class="about-content">
+            <p>CivicPulse Hub is an innovative smart city platform designed to revolutionize how citizens interact with municipal services. Our unified feedback and redressal system creates a transparent, efficient, and accountable ecosystem for civic issue management.</p>
+            
+            <p>By leveraging cutting-edge technology and user-centric design, we empower residents to report problems ranging from infrastructure issues to public service concerns. Our intelligent tracking system ensures that every complaint is logged, assigned, and resolved in a timely manner.</p>
+            
+            <p>This internship project demonstrates the potential of digital transformation in urban governance, showcasing how technology can bridge the gap between citizens and administrators while fostering a culture of responsive governance and community participation.</p>
+            
+            <p><strong>Key Objectives:</strong> Streamline civic complaint processes • Enhance transparency in governance • Improve response times • Foster community engagement • Enable data-driven decision making</p>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <div class="section-header">
+            <h2>Get In Touch</h2>
+            <p>Have questions? We'd love to hear from you</p>
+        </div>
+        <div class="contact-content">
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <div class="contact-icon">📧</div>
+                    <h3>Email Us</h3>
+                    <p>contact@civicpulse.hub</p>
+                    <p>support@civicpulse.hub</p>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📱</div>
+                    <h3>Call Us</h3>
+                    <p>+91-1800-CIVIC-HUB</p>
+                    <p>Mon-Fri: 9AM - 6PM</p>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📍</div>
+                    <h3>Visit Us</h3>
+                    <p>Smart City Innovation Lab</p>
+                    <p>Delhi, India</p>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">💬</div>
+                    <h3>Social Media</h3>
+                    <p>@CivicPulseHub</p>
+                    <p>Follow us for updates</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>© 2024 CivicPulse Hub</strong> - Making Cities Smarter, One Feedback at a Time</p>
+        <p>Internship Project | Smart City Feedback and Redressal System</p>
+        <p style="margin-top: 1rem; opacity: 0.7;">Reporting • Tracking • Resolving | Building Tomorrow's Smart Cities Today</p>
+    </footer>
+
+    <script>
+        // Check if user is logged in before allowing actions
+        function checkLoginAndReport() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn) {
+                // Redirect to appropriate dashboard
+                const role = localStorage.getItem('userRole');
+                redirectToDashboard(role);
+            } else {
+                alert('Please sign in to report an issue');
+                window.location.href = 'signin.html';
+            }
+        }
+
+        function checkLoginAndTrack() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn) {
+                const role = localStorage.getItem('userRole');
+                redirectToDashboard(role);
+            } else {
+                alert('Please sign in to track your reports');
+                window.location.href = 'signin.html';
+            }
+        }
+
+        function redirectToDashboard(role) {
+            if (role === 'citizen') {
+                window.location.href = 'citizen-dashboard.html';
+            } else if (role === 'official') {
+                window.location.href = 'officer-dashboard.html';
+            } else if (role === 'admin') {
+                window.location.href = 'admin-dashboard.html';
+            }
+        }
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

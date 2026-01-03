@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen Dashboard - CivicPulse Hub</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="citizen-dashboard.css">
+    
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">🏙️ CivicPulse Hub</div>
+                <div class="user-role">Citizen Portal</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-link active" data-section="overview">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Overview</span>
+                </a>
+                <a href="#report" class="nav-link" data-section="report">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Report Issue</span>
+                </a>
+                <a href="#my-reports" class="nav-link" data-section="my-reports">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">My Reports</span>
+                </a>
+                <a href="#track" class="nav-link" data-section="track">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Track Status</span>
+                </a>
+                <a href="#votes" class="nav-link" data-section="votes">
+                    <span class="nav-icon">🗳️</span>
+                    <span class="nav-text">Community Votes</span>
+                </a>
+                <a href="#profile" class="nav-link" data-section="profile">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">My Profile</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="handleLogout()">
+                    <span>🚪</span> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="welcome-section">
+                    <h1>Welcome back, <span id="citizenName">Citizen</span>!</h1>
+                    <p>Manage your civic reports and track their progress</p>
+                </div>
+                <button class="btn btn-primary quick-report-btn" onclick="showReportSection()">
+                    📝 Quick Report
+                </button>
+            </div>
+
+            <!-- Overview Section -->
+            <section id="overview-section" class="content-section active">
+                <div class="section-title">
+                    <h2>Dashboard Overview</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-content">
+                            <h3 id="totalReports">0</h3>
+                            <p>Total Reports</p>
+                        </div>
+                    </div>
+                    <div class="stat-card yellow">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-content">
+                            <h3 id="pendingReports">0</h3>
+                            <p>Pending</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon">🔧</div>
+                        <div class="stat-content">
+                            <h3 id="inProgressReports">0</h3>
+                            <p>In Progress</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <h3 id="resolvedReports">0</h3>
+                            <p>Resolved</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <h3>Recent Reports</h3>
+                    <div id="recentReportsList" class="reports-list">
+                        <p style="text-align: center; color: #94a3b8; padding: 20px;">Loading reports...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Report Issue Section -->
+            <section id="report-section" class="content-section">
+                <div class="section-title">
+                    <h2>🚀 Report a New Issue</h2>
+                    <p>Help us improve your community by reporting civic issues</p>
+                </div>
+
+                <div class="form-container">
+                    <form id="reportForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reportTitle">Issue Title *</label>
+                                <input type="text" id="reportTitle" placeholder="Brief title of the issue" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reportCategory">Issue Category *</label>
+                                <select id="reportCategory" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Road">Road & Infrastructure</option>
+                                    <option value="Water">Water Supply</option>
+                                    <option value="Electricity">Electricity</option>
+                                    <option value="Sanitation">Sanitation & Waste</option>
+                                    <option value="Street Light">Street Lighting</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reportLocation">Location *</label>
+                            <input type="text" id="reportLocation" placeholder="Enter address or click map to select" required>
+                            <button type="button" class="btn btn-secondary" onclick="openMapPicker()" style="margin-top: 8px;">
+                                📍 Pick Location on Map
+                            </button>
+                            <input type="hidden" id="reportLatitude">
+                            <input type="hidden" id="reportLongitude">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reportDescription">Issue Description *</label>
+                            <textarea id="reportDescription" rows="5" placeholder="Describe the issue in detail..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reportPhoto">Upload Photo (Max 5MB) *</label>
+                            <input type="file" id="reportPhoto" accept="image/jpeg,image/png,image/jpg" required>
+                            <small style="color: #64748b; display: block; margin-top: 4px;">
+                                Accepted formats: JPG, JPEG, PNG (Max size: 5MB)
+                            </small>
+                            <div id="imagePreview" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-large" id="submitBtn">
+                            Submit Report
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- My Reports Section -->
+            <section id="my-reports-section" class="content-section">
+                <div class="section-title">
+                    <h2>📋 My Reports</h2>
+                    <p>View and manage all your submitted reports</p>
+                </div>
+
+                <div class="filter-bar">
+                    <select id="statusFilter" onchange="filterReports()">
+                        <option value="all">All Status</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="RESOLVED">Resolved</option>
+                    </select>
+                    <select id="categoryFilter" onchange="filterReports()">
+                        <option value="all">All Categories</option>
+                        <option value="Road">Road & Infrastructure</option>
+                        <option value="Water">Water Supply</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Sanitation">Sanitation & Waste</option>
+                        <option value="Street Light">Street Lighting</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div id="myReportsList" class="reports-grid">
+                    <p style="text-align: center; color: #94a3b8; padding: 40px; grid-column: 1/-1;">
+                        Loading your reports...
+                    </p>
+                </div>
+            </section>
+
+            <!-- Track Status Section -->
+            <section id="track-section" class="content-section">
+                <div class="section-title">
+                    <h2>🔍 Track Report Status</h2>
+                    <p>Search and track any report by ID</p>
+                </div>
+
+                <div class="search-container" style="display: flex; gap: 12px; max-width: 600px; margin-bottom: 30px;">
+                    <input type="text" id="searchQuery" placeholder="Enter Report ID (e.g., GRV001)" style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                    <button class="btn btn-primary" onclick="searchReport()">Search</button>
+                </div>
+
+                <div id="trackResults" class="track-results">
+                    <p style="text-align: center; color: #94a3b8; padding: 40px;">
+                        Enter a Report ID to track its status
+                    </p>
+                </div>
+            </section>
+
+            <!-- Community Votes Section -->
+            <section id="votes-section" class="content-section">
+                <div class="section-title">
+                    <h2>🗳️ Community Votes</h2>
+                    <p>Vote on issue priorities in your area</p>
+                </div>
+
+                <div id="votingList" class="voting-grid">
+                    <p style="text-align: center; color: #94a3b8; padding: 40px;">
+                        Community voting feature coming soon...
+                    </p>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile-section" class="content-section">
+                <div class="section-title">
+                    <h2>👤 My Profile</h2>
+                    <p>Manage your account information</p>
+                </div>
+
+                <div class="profile-container">
+                    <div class="profile-card">
+                        <div class="profile-avatar">👤</div>
+                        <div class="profile-info">
+                            <h3 id="profileName">User Name</h3>
+                            <p id="profileEmail">user@email.com</p>
+                            <p id="profilePhone">+91 1234567890</p>
+                            <span class="profile-badge">Citizen</span>
+                        </div>
+                        <button class="btn btn-secondary">Edit Profile</button>
+                    </div>
+                    <!-- My Profile Section -->
+<div id="profile-section" class="content-section" style="display: none;">
+    <h2>👤 My Profile</h2>
+    
+    <!-- View Mode -->
+    <div id="view-mode">
+        <div class="profile-info">
+            <h3 id="display-name">chinkii</h3>
+            <p id="display-email">chinkii@gmail.com</p>
+            <p id="display-phone">9876543210</p>
+            <button class="btn btn-primary" onclick="showEditForm()">✏️ Edit Profile</button>
+        </div>
+    </div>
+    
+    <!-- Edit Mode -->
+    <div id="edit-mode" style="display: none;">
+        <form onsubmit="updateProfile(event)">
+            <div>
+                <label>Name:</label>
+                <input type="text" id="edit-name" required>
+            </div>
+            <div>
+                <label>Email:</label>
+                <input type="email" id="edit-email" required>
+            </div>
+            <div>
+                <label>Phone:</label>
+                <input type="tel" id="edit-phone" required>
+            </div>
+            <button type="submit" class="btn btn-primary">💾 Save</button>
+            <button type="button" class="btn btn-secondary" onclick="cancelEdit()">❌ Cancel</button>
+        </form>
+    </div>
+</div>
+                    <div class="activity-summary">
+                        <h3>Activity Summary</h3>
+                        <ul>
+                            <li>Member since: <strong id="memberSince">2025</strong></li>
+                            <li>Total Reports: <strong id="profileTotalReports">0</strong></li>
+                            <li>Resolved Issues: <strong id="profileResolvedReports">0</strong></li>
+                            <li>Community Votes: <strong id="profileVotes">0</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Map Modal (Hidden by default) -->
+    <div id="mapModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 16px; padding: 20px; width: 90%; max-width: 800px; max-height: 90vh; overflow: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Select Location on Map</h3>
+                <button onclick="closeMapPicker()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+            </div>
+            <div id="map" style="width: 100%; height: 400px; border-radius: 8px;"></div>
+            <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeMapPicker()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmLocation()">Confirm Location</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="citizen-dashboard.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</body>
+</html>

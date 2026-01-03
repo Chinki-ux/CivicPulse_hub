@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officer Dashboard - CivicPulse Hub</title>
+    <link rel="stylesheet" href="officer-dashboard.css">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">🏙️ CivicPulse Hub</div>
+                <div class="user-role officer">Officer Portal</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-link active" data-section="overview">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Overview</span>
+                </a>
+                <a href="#assigned" class="nav-link" data-section="assigned">
+                    <span class="nav-icon">📌</span>
+                    <span class="nav-text">Assigned to Me</span>
+                </a>
+                <a href="#all-reports" class="nav-link" data-section="all-reports">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">All Reports</span>
+                </a>
+                <a href="#update" class="nav-link" data-section="update">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-text">Update Status</span>
+                </a>
+                <a href="#workload" class="nav-link" data-section="workload">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">My Workload</span>
+                </a>
+                <a href="#profile" class="nav-link" data-section="profile">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">My Profile</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <span>🚪</span> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="welcome-section">
+                    <h1>Welcome, Officer <span id="officerName">Kumar</span>!</h1>
+                    <p>Manage and resolve civic issues efficiently</p>
+                </div>
+                <div class="alert-badge">
+                    <span class="badge urgent">🔔 <span id="urgentCount">3</span> Urgent</span>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <section id="overview-section" class="content-section active">
+                <div class="section-title">
+                    <h2>Dashboard Overview</h2>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon">📌</div>
+                        <div class="stat-content">
+                            <h3 id="assignedToMe">0</h3>
+                            <p>Assigned to Me</p>
+                        </div>
+                    </div>
+                    <div class="stat-card yellow">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-content">
+                            <h3 id="pendingWork">0</h3>
+                            <p>Pending</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon">🔧</div>
+                        <div class="stat-content">
+                            <h3 id="inProgressWork">0</h3>
+                            <p>In Progress</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <h3 id="completedWork">0</h3>
+                            <p>Completed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="priority-alerts">
+                    <h3>🚨 Priority Issues</h3>
+                    <div id="priorityIssuesList" class="reports-list">
+                        <div class="loading-message">Loading priority issues...</div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <h3>Recent Assignments</h3>
+                    <div id="recentAssignments" class="reports-list">
+                        <div class="loading-message">Loading recent assignments...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Assigned to Me Section -->
+            <section id="assigned-section" class="content-section">
+                <div class="section-title">
+                    <h2>📌 Issues Assigned to Me</h2>
+                    <p>Manage your assigned civic issues</p>
+                </div>
+                
+                <div class="filter-bar">
+                    <select id="assignedStatusFilter">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                    <select id="assignedPriorityFilter">
+                        <option value="all">All Priority</option>
+                        <option value="urgent">Urgent</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                
+                <div id="assignedReportsList" class="reports-grid">
+                    <div class="loading-message">Loading assigned issues...</div>
+                </div>
+            </section>
+
+            <!-- All Reports Section -->
+            <section id="all-reports-section" class="content-section">
+                <div class="section-title">
+                    <h2>📋 All Reports</h2>
+                    <p>View all civic reports in the system</p>
+                </div>
+                
+                <div class="filter-bar">
+                    <input type="text" id="searchAllReports" placeholder="Search by ID, location, or category">
+                    <select id="allStatusFilter">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                    <select id="allCategoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="Road">Road & Infrastructure</option>
+                        <option value="Water">Water Supply</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Sanitation">Sanitation & Waste</option>
+                        <option value="Street Light">Street Lighting</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div id="allReportsList" class="reports-grid">
+                    <div class="loading-message">Loading all reports...</div>
+                </div>
+            </section>
+
+            <!-- Update Status Section -->
+            <section id="update-section" class="content-section">
+                <div class="section-title">
+                    <h2>🔄 Update Report Status</h2>
+                    <p>Update the status and add notes to reports</p>
+                </div>
+                
+                <div class="form-container">
+                    <form id="updateStatusForm">
+                        <div class="form-group">
+                            <label for="updateReportId">Report ID *</label>
+                            <input type="text" id="updateReportId" placeholder="Enter Report ID" required>
+                            <button type="button" class="btn btn-secondary" id="loadReportBtn">Load Report</button>
+                        </div>
+                        
+                        <div id="reportDetailsContainer" class="report-details" style="display: none;">
+                            <h4>Report Details</h4>
+                            <p id="reportDetailsInfo"></p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newStatus">Update Status *</label>
+                            <select id="newStatus" required>
+                                <option value="">Select Status</option>
+                                <option value="PENDING">Pending</option>
+                                <option value="IN_PROGRESS">In Progress</option>
+                                <option value="RESOLVED">Resolved</option>
+                                <option value="COMPLETED">Completed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="statusNotes">Add Notes *</label>
+                            <textarea id="statusNotes" rows="4" placeholder="Add notes about the update..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="estimatedTime">Estimated Resolution Time</label>
+                            <input type="text" id="estimatedTime" placeholder="e.g., 2-3 days">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-large">Update Status</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- My Workload Section -->
+            <section id="workload-section" class="content-section">
+                <div class="section-title">
+                    <h2>📈 My Workload Analytics</h2>
+                    <p>Track your performance and productivity</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>This Week</h4>
+                        <h3 id="weeklyResolved">0</h3>
+                        <p>Issues Resolved</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>This Month</h4>
+                        <h3 id="monthlyResolved">0</h3>
+                        <p>Issues Resolved</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Average Time</h4>
+                        <h3 id="avgResolutionTime">0</h3>
+                        <p>Days to Resolve</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Success Rate</h4>
+                        <h3 id="successRate">0%</h3>
+                        <p>Resolution Rate</p>
+                    </div>
+                </div>
+                
+                <div class="performance-chart">
+                    <h3>Performance Trends</h3>
+                    <div id="performanceChart" class="chart-placeholder">
+                        <p>📊 Chart visualization would go here</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile-section" class="content-section">
+                <div class="section-title">
+                    <h2>👤 My Profile</h2>
+                    <p>Manage your account information</p>
+                </div>
+                
+                <div class="profile-container">
+                    <div class="profile-card">
+                        <div class="profile-avatar">👮</div>
+                        <div class="profile-info">
+                            <h3 id="profileName">Officer Name</h3>
+                            <p id="profileEmail">officer@civicpulse.hub</p>
+                            <p id="profilePhone">+91 1234567890</p>
+                            <span class="profile-badge officer">Government Official</span>
+                            <p><strong>Department:</strong> <span id="department">Infrastructure</span></p>
+                        </div>
+                        <button class="btn btn-secondary">Edit Profile</button>
+                    </div>
+                    
+                    <div class="activity-summary">
+                        <h3>Officer Statistics</h3>
+                        <ul>
+                            <li>Officer since: <strong id="officerSince">2025</strong></li>
+                            <li>Total Assigned: <strong id="totalAssigned">0</strong></li>
+                            <li>Total Resolved: <strong id="totalResolved">0</strong></li>
+                            <li>Current Workload: <strong id="currentWorkload">0</strong></li>
+                            <li>Average Rating: <strong id="avgRating">⭐ 4.5/5</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="officer-dashboard.js"></script>
+</body>
+</html>
