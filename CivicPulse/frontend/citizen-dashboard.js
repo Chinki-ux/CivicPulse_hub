@@ -306,8 +306,44 @@ function makeDetailCard(r) {
                     </div>
                 ` : ''}
             </div>
-            <div class="report-card-footer">
+            <div class="report-card-footer" style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="report-card-date">📅 ${formatDate(r.createdAt)}</span>
+                
+                <!-- ✅ FEEDBACK BUTTON FOR RESOLVED COMPLAINTS -->
+                <div style="display: flex; gap: 8px;">
+                    ${r.status === 'RESOLVED' && !r.feedbackSubmitted ? `
+                        <button class="btn-feedback" onclick="goToFeedback(${r.id})" style="
+                            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                            color: white;
+                            border: none;
+                            padding: 8px 16px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 600;
+                            font-size: 14px;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 6px;
+                            transition: all 0.3s ease;
+                            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+                        ">
+                            ⭐ Give Feedback
+                        </button>
+                    ` : ''}
+                    
+                    ${r.feedbackSubmitted ? `
+                        <span style="
+                            color: #10b981;
+                            font-weight: 600;
+                            padding: 8px 16px;
+                            background: #ecfdf5;
+                            border-radius: 8px;
+                            font-size: 14px;
+                        ">
+                            ✅ Feedback Submitted
+                        </span>
+                    ` : ''}
+                </div>
             </div>
         </div>
     `;
@@ -827,6 +863,11 @@ async function updateProfile(event) {
         alert('❌ Failed to update profile!');
         console.error(error);
     }
+}
+
+// ✅ Navigate to feedback page
+function goToFeedback(grievanceId) {
+    window.location.href = `feedback.html?grievanceId=${grievanceId}`;
 }
 
 console.log('✅ Dashboard loaded!');

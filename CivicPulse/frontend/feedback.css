@@ -1,0 +1,389 @@
+/* ========================================
+   FEEDBACK & RATING SYSTEM STYLES
+   ======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 700px;
+}
+
+.feedback-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.feedback-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.feedback-header h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.feedback-header p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* Status Section */
+.status-section {
+    padding: 30px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.status-section h2 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.status-item .label {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+}
+
+.status-item .value {
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+}
+
+.status-resolved {
+    color: #10b981;
+    background: #ecfdf5;
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    font-size: 14px;
+}
+
+/* Rating Section */
+.rating-section {
+    padding: 30px;
+    text-align: center;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.rating-section h2 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.rating-label {
+    color: #666;
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+.star-rating {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.star {
+    font-size: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    filter: grayscale(100%);
+    opacity: 0.4;
+}
+
+.star:hover,
+.star.active {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.star.active {
+    animation: starPulse 0.3s ease;
+}
+
+@keyframes starPulse {
+    0%, 100% {
+        transform: scale(1.2);
+    }
+    50% {
+        transform: scale(1.4);
+    }
+}
+
+.rating-text {
+    font-size: 18px;
+    color: #667eea;
+    font-weight: 600;
+    margin-top: 10px;
+    min-height: 30px;
+}
+
+/* Feedback Form */
+.feedback-form {
+    padding: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.3s;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Button Group */
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn {
+    flex: 1;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-icon {
+    font-size: 18px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background: white;
+    color: #ef4444;
+    border: 2px solid #ef4444;
+}
+
+.btn-secondary:hover {
+    background: #ef4444;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+}
+
+.btn-link {
+    background: none;
+    color: #667eea;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 10px;
+}
+
+.btn-link:hover {
+    color: #764ba2;
+}
+
+/* Success Message */
+.success-message,
+.info-message {
+    padding: 50px 30px;
+    text-align: center;
+}
+
+.success-icon,
+.info-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    font-size: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    animation: successPop 0.5s ease;
+}
+
+.info-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+@keyframes successPop {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.success-message h3,
+.info-message h3 {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.success-message p,
+.info-message p {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.previous-feedback {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.previous-feedback .rating-display {
+    color: #f59e0b;
+    font-size: 20px;
+    margin: 10px 0;
+}
+
+.previous-feedback .comment-display {
+    color: #333;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .star {
+        font-size: 40px;
+    }
+
+    .feedback-header h1 {
+        font-size: 24px;
+    }
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

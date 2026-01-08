@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback & Rating - CivicPulse Hub</title>
+    <link rel="stylesheet" href="feedback.css">
+</head>
+<body>
+    <div class="container">
+        <div class="feedback-card">
+            <!-- Header -->
+            <div class="feedback-header">
+                <h1>📋 Complaint Feedback</h1>
+                <p>Your feedback helps us improve our services</p>
+            </div>
+
+            <!-- Complaint Status Section -->
+            <div class="status-section">
+                <h2>Complaint Status</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="label">Complaint ID:</span>
+                        <span class="value" id="complaintId">CMP-1023</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Status:</span>
+                        <span class="value status-resolved" id="complaintStatus">
+                            ✅ Resolved
+                        </span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Resolved Date:</span>
+                        <span class="value" id="resolvedDate">05-Jan-2026</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Title:</span>
+                        <span class="value" id="complaintTitle">Water supply issue</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rating Section -->
+            <div class="rating-section">
+                <h2>⭐ Rate Your Experience</h2>
+                <p class="rating-label">How satisfied are you with the resolution?</p>
+                
+                <div class="star-rating" id="starRating">
+                    <span class="star" data-rating="1">⭐</span>
+                    <span class="star" data-rating="2">⭐</span>
+                    <span class="star" data-rating="3">⭐</span>
+                    <span class="star" data-rating="4">⭐</span>
+                    <span class="star" data-rating="5">⭐</span>
+                </div>
+                
+                <div class="rating-text" id="ratingText">Click to rate</div>
+            </div>
+
+            <!-- Feedback Form -->
+            <form id="feedbackForm" class="feedback-form">
+                <div class="form-group">
+                    <label for="feedbackComment">📝 Additional Comments (Optional)</label>
+                    <textarea 
+                        id="feedbackComment" 
+                        name="comment" 
+                        rows="5" 
+                        placeholder="Share your experience, suggestions, or concerns..."
+                        maxlength="500"
+                    ></textarea>
+                    <div class="char-count">
+                        <span id="charCount">0</span>/500 characters
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <span class="btn-icon">✓</span>
+                        Submit Feedback
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="reopenBtn">
+                        <span class="btn-icon">↻</span>
+                        Reopen Complaint
+                    </button>
+                </div>
+            </form>
+
+            <!-- Success Message (Hidden by default) -->
+            <div class="success-message" id="successMessage" style="display: none;">
+                <div class="success-icon">✔</div>
+                <h3>Thank you for your feedback!</h3>
+                <p>Your response has been recorded successfully.</p>
+                <button class="btn btn-link" onclick="window.location.href='citizen-dashboard.html'">
+                    Back to Dashboard
+                </button>
+            </div>
+
+            <!-- Already Submitted Message (Hidden by default) -->
+            <div class="info-message" id="alreadySubmitted" style="display: none;">
+                <div class="info-icon">ℹ️</div>
+                <h3>Feedback Already Submitted</h3>
+                <p>You have already provided feedback for this complaint.</p>
+                <div class="previous-feedback" id="previousFeedback">
+                    <!-- Will be populated dynamically -->
+                </div>
+                <button class="btn btn-link" onclick="window.location.href='citizen-dashboard.html'">
+                    Back to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="feedback.js"></script>
+</body>
+</html>
