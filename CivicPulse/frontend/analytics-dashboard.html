@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Dashboard - CivicPulse Hub</title>
+    <link rel="stylesheet" href="analytics-dashboard.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">🏙️ CivicPulse Hub</div>
+                <div class="user-role admin">Admin Analytics</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="admin-dashboard.html" class="nav-link">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Main Dashboard</span>
+                </a>
+                <a href="#overview" class="nav-link active" data-section="overview">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics Overview</span>
+                </a>
+                <a href="#category" class="nav-link" data-section="category">
+                    <span class="nav-icon">🥧</span>
+                    <span class="nav-text">Category Analysis</span>
+                </a>
+                <a href="#zones" class="nav-link" data-section="zones">
+                    <span class="nav-icon">🗺️</span>
+                    <span class="nav-text">Zone Heat Map</span>
+                </a>
+                <a href="#sla" class="nav-link" data-section="sla">
+                    <span class="nav-icon">⏱️</span>
+                    <span class="nav-text">SLA Performance</span>
+                </a>
+                <a href="#red-zones" class="nav-link" data-section="red-zones">
+                    <span class="nav-icon">🚨</span>
+                    <span class="nav-text">Red Zones</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-back" onclick="window.location.href='admin-dashboard.html'">
+                    ← Back to Dashboard
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="welcome-section">
+                    <h1>📈 Analytics & Insights</h1>
+                    <p>Real-time complaint analytics and performance tracking</p>
+                </div>
+                <div class="refresh-section">
+                    <button class="btn btn-primary" id="refreshBtn" onclick="loadAllAnalytics()">
+                        🔄 Refresh Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <section id="overview-section" class="content-section active">
+                <div class="section-title">
+                    <h2>System Overview</h2>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-content">
+                            <h3 id="totalComplaints">0</h3>
+                            <p>Total Complaints</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <h3 id="resolvedComplaints">0</h3>
+                            <p>Resolved</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon">🔧</div>
+                        <div class="stat-content">
+                            <h3 id="inProgressComplaints">0</h3>
+                            <p>In Progress</p>
+                        </div>
+                    </div>
+                    <div class="stat-card yellow">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-content">
+                            <h3 id="pendingComplaints">0</h3>
+                            <p>Pending</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="metrics-row">
+                    <div class="metric-card">
+                        <h3>Resolution Rate</h3>
+                        <div class="metric-value" id="resolutionRate">0%</div>
+                        <p class="metric-label">Overall completion rate</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Avg Resolution Time</h3>
+                        <div class="metric-value" id="avgResolutionTime">0</div>
+                        <p class="metric-label">Days to resolve</p>
+                    </div>
+                </div>
+
+                <!-- Quick Charts Preview -->
+                <div class="charts-preview">
+                    <div class="chart-card">
+                        <h3>Complaints by Category</h3>
+                        <canvas id="quickCategoryChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>SLA Compliance Overview</h3>
+                        <canvas id="quickSLAChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Category Analysis Section -->
+            <section id="category-section" class="content-section">
+                <div class="section-title">
+                    <h2>🥧 Category-wise Analysis</h2>
+                    <p>Complaint distribution across different categories</p>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card large">
+                        <h3>Category Distribution (Pie Chart)</h3>
+                        <canvas id="categoryPieChart"></canvas>
+                    </div>
+                    <div class="chart-card large">
+                        <h3>Category Distribution (Bar Chart)</h3>
+                        <canvas id="categoryBarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Category Table -->
+                <div class="data-table-card">
+                    <h3>Category Statistics</h3>
+                    <table id="categoryTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Count</th>
+                                <th>Percentage</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryTableBody">
+                            <tr>
+                                <td colspan="4">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Zone Heat Map Section -->
+            <section id="zones-section" class="content-section">
+                <div class="section-title">
+                    <h2>🗺️ Zone-wise Heat Map</h2>
+                    <p>Complaint-prone zones and geographical distribution</p>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card fullwidth">
+                        <h3>Zone Distribution</h3>
+                        <canvas id="zoneBarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Zone Table -->
+                <div class="data-table-card">
+                    <h3>Top Complaint Zones</h3>
+                    <table id="zoneTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Zone/Location</th>
+                                <th>Complaints</th>
+                                <th>Heat Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="zoneTableBody">
+                            <tr>
+                                <td colspan="3">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SLA Performance Section -->
+            <section id="sla-section" class="content-section">
+                <div class="section-title">
+                    <h2>⏱️ SLA Performance Analysis</h2>
+                    <p>Track complaint resolution efficiency against SLA targets</p>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card large">
+                        <h3>SLA Compliance Rate by Category</h3>
+                        <canvas id="slaComplianceChart"></canvas>
+                    </div>
+                    <div class="chart-card large">
+                        <h3>Average Resolution Time vs SLA Target</h3>
+                        <canvas id="slaResolutionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- SLA Table -->
+                <div class="data-table-card">
+                    <h3>SLA Performance Details</h3>
+                    <table id="slaTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>SLA Target</th>
+                                <th>Total</th>
+                                <th>Within SLA</th>
+                                <th>Breached</th>
+                                <th>Avg Days</th>
+                                <th>Compliance %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="slaTableBody">
+                            <tr>
+                                <td colspan="7">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Red Zones Section -->
+            <section id="red-zones-section" class="content-section">
+                <div class="section-title">
+                    <h2>🚨 Red Zones Identification</h2>
+                    <p>High-risk areas with repeated complaints</p>
+                </div>
+
+                <!-- Red Zones Grid -->
+                <div id="redZonesGrid" class="red-zones-grid">
+                    <div class="loading-message">Loading red zones...</div>
+                </div>
+
+                <!-- Red Zones Chart -->
+                <div class="chart-card fullwidth">
+                    <h3>Top 10 Complaint-Prone Areas</h3>
+                    <canvas id="redZonesChart"></canvas>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="analytics-dashboard.js"></script>
+</body>
+</html>

@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - CivicPulse Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="admin-dashboard.css">
+    
 </head>
 <body>
     <div class="dashboard-wrapper">
@@ -40,6 +42,11 @@
                 <a href="#officers" class="nav-link" data-section="officers">
                     <span class="nav-icon">👮</span>
                     <span class="nav-text">Manage Officers</span>
+                </a>
+                <a href="#feedback" class="nav-link" data-section="feedback">
+                    <span class="nav-icon">⭐</span>
+                    <span class="nav-text">Feedback Management</span>
+                    <span class="badge-count" id="pendingFeedbackCount">0</span>
                 </a>
                 <a href="#analytics" class="nav-link" data-section="analytics">
                     <span class="nav-icon">📈</span>
@@ -345,9 +352,9 @@
                 <div class="analytics-grid">
                     <div class="analytics-card">
                         <h3>Reports by Category</h3>
-                        <div id="categoryChart" class="chart-placeholder">
-                            <p>📊 Loading chart...</p>
-                        </div>
+                       <div class="chart-container" style="position: relative; height: 250px;">
+    <canvas id="categoryChart"></canvas>
+</div>
                     </div>
 
                     <div class="analytics-card">
@@ -377,6 +384,100 @@
                 </div>
             </section>
 
+            <!-- Feedback Management Section -->
+            <section id="feedback-section" class="content-section">
+                <div class="section-title">
+                    <h2>⭐ Feedback Management</h2>
+                    <p>Monitor citizen feedback and satisfaction ratings</p>
+                </div>
+
+                <!-- Feedback Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <h3 id="totalFeedbackReceived">0</h3>
+                            <p>Total Feedback</p>
+                        </div>
+                    </div>
+                    <div class="stat-card yellow">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-content">
+                            <h3 id="pendingFeedbackStat">0</h3>
+                            <p>Pending Feedback</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon">🔄</div>
+                        <div class="stat-content">
+                            <h3 id="reopenedComplaintsStat">0</h3>
+                            <p>Reopened Complaints</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-content">
+                            <h3 id="averageRatingStat">0.0</h3>
+                            <p>Average Rating</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Tabs -->
+                <div class="tabs-container">
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="all-feedback">All Feedback</button>
+                        <button class="tab-btn" data-tab="pending-feedback">Pending Feedback</button>
+                        <button class="tab-btn" data-tab="reopened-complaints">Reopened Complaints</button>
+                    </div>
+
+                    <!-- All Feedback Tab -->
+                    <div id="all-feedback" class="tab-content active">
+                        <div class="filter-bar">
+                            <input type="text" id="feedbackSearch" placeholder="Search by ID, citizen name...">
+                            <select id="feedbackRatingFilter">
+                                <option value="all">All Ratings</option>
+                                <option value="5">⭐⭐⭐⭐⭐ (5 stars)</option>
+                                <option value="4">⭐⭐⭐⭐ (4 stars)</option>
+                                <option value="3">⭐⭐⭐ (3 stars)</option>
+                                <option value="2">⭐⭐ (2 stars)</option>
+                                <option value="1">⭐ (1 star)</option>
+                            </select>
+                        </div>
+                        <div id="allFeedbackList" class="reports-list">
+                            <div class="loading-message">Loading feedback...</div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Feedback Tab -->
+                    <div id="pending-feedback" class="tab-content">
+                        <div class="info-banner">
+                            <p>📝 These are resolved complaints waiting for citizen feedback</p>
+                        </div>
+                        <div id="pendingFeedbackList" class="reports-list">
+                            <div class="loading-message">Loading pending feedback...</div>
+                        </div>
+                    </div>
+
+                    <!-- Reopened Complaints Tab -->
+                    <div id="reopened-complaints" class="tab-content">
+                        <div class="warning-banner">
+                            <p>⚠️ These complaints were reopened due to citizen dissatisfaction</p>
+                        </div>
+                        <div id="reopenedComplaintsList" class="reports-list">
+                            <div class="loading-message">Loading reopened complaints...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rating Distribution Chart -->
+                <div class="dashboard-card" style="margin-top: 25px;">
+                    <h3>📊 Rating Distribution</h3>
+                    <div id="ratingDistribution" class="rating-chart">
+                        <div class="loading-message">Loading rating distribution...</div>
+                    </div>
+                </div>
+            </section>
             <!-- Settings Section -->
             <section id="settings-section" class="content-section">
                 <div class="section-title">

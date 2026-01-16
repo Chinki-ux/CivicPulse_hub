@@ -39,6 +39,8 @@ if (!currentAdmin) {
     // Setup everything
     setupNavigation();
     setupEventListeners();
+    setupFeedbackTabs(); // ✅ Setup feedback tabs
+    setupFeedbackFilters(); // ✅ Setup feedback filters
     loadAllData();
     
     console.log('✅ Admin Dashboard initialized!');
@@ -115,6 +117,8 @@ function loadAllData() {
     loadAllGrievances();
     loadAllUsers();
     // loadAllOfficers(); // Comment out for now
+    loadFeedbackData(); // ✅ Load feedback data
+     loadAnalyticsData();
 }
 // ========================================
 // FETCH ALL GRIEVANCES (REAL DATA)
@@ -1303,3 +1307,485 @@ function viewOfficerDetails(id) {
 }
 
 console.log('✅ Admin Dashboard Script Loaded with Verification!');
+// ========================================
+// FEEDBACK MANAGEMENT FUNCTIONS
+// ========================================
+
+let allFeedback = [];
+let pendingFeedback = [];
+let reopenedComplaints = [];
+
+/**
+ * Load all feedback data
+ */
+async function loadFeedbackData() {
+    console.log('📥 Loading feedback data...');
+    
+    try {
+        const token = localStorage.getItem('token');
+        
+        // Load all feedback
+        const allFeedbackResponse = await fetch(`${API_URL}/feedback/admin/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (allFeedbackResponse.ok) {
+            allFeedback = await allFeedbackResponse.json();
+            console.log('✅ Loaded feedback:', allFeedback.length);
+        }
+        
+        // Load pending feedback
+        const pendingResponse = await fetch(`${API_URL}/feedback/admin/pending`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (pendingResponse.ok) {
+            pendingFeedback = await pendingResponse.json();
+            console.log('✅ Pending feedback:', pendingFeedback.length);
+        }
+        
+        // Load reopened complaints
+        const reopenedResponse = await fetch(`${API_URL}/feedback/admin/reopened`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (reopenedResponse.ok) {
+            reopenedComplaints = await reopenedResponse.json();
+            console.log('✅ Reopened complaints:', reopenedComplaints.length);
+        }
+        
+        // Load stats
+        await loadFeedbackStats();
+        
+        // Display feedback
+        displayAllFeedback();
+        displayPendingFeedback();
+        displayReopenedComplaints();
+        
+    } catch (error) {
+        console.error('❌ Error loading feedback:', error);
+    }
+}
+
+/**
+ * Load feedback statistics
+ */
+async function loadFeedbackStats() {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/feedback/admin/stats`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const stats = await response.json();
+            console.log('📊 Feedback stats:', stats);
+            
+            // Update stats cards
+            document.getElementById('totalFeedbackReceived').textContent = stats.feedbackReceived || 0;
+            document.getElementById('pendingFeedbackStat').textContent = stats.pendingFeedback || 0;
+            document.getElementById('reopenedComplaintsStat').textContent = stats.reopenedCount || 0;
+            document.getElementById('averageRatingStat').textContent = stats.averageRating?.toFixed(1) || '0.0';
+            
+            // Update badge count
+            const badge = document.getElementById('pendingFeedbackCount');
+            if (badge) {
+                badge.textContent = stats.pendingFeedback || 0;
+                badge.style.display = stats.pendingFeedback > 0 ? 'inline-block' : 'none';
+            }
+            
+            // Display rating distribution
+            displayRatingDistribution(stats.ratingDistribution);
+        }
+    } catch (error) {
+        console.error('❌ Error loading feedback stats:', error);
+    }
+}
+
+/**
+ * Display all feedback
+ */
+function displayAllFeedback() {
+    const container = document.getElementById('allFeedbackList');
+    if (!container) return;
+    
+    if (allFeedback.length === 0) {
+        container.innerHTML = '<div class="empty-state">📝 No feedback received yet</div>';
+        return;
+    }
+    
+    container.innerHTML = allFeedback.map(feedback => createFeedbackCard(feedback)).join('');
+}
+
+/**
+ * Create feedback card HTML
+ */
+function createFeedbackCard(feedback) {
+    const stars = '⭐'.repeat(feedback.rating || 0);
+    const grievance = feedback.grievance || {};
+    const user = feedback.user || {};
+    const isReopened = feedback.isReopened;
+    
+    const statusBadge = isReopened ? 
+        '<span class="badge badge-danger">🔄 REOPENED</span>' : 
+        '<span class="badge badge-success">✅ FEEDBACK GIVEN</span>';
+    
+    return `
+        <div class="feedback-card ${isReopened ? 'reopened-card' : ''}">
+            <div class="feedback-header">
+                <div>
+                    <strong>Grievance #${grievance.id}</strong> - ${grievance.title || grievance.category}
+                    ${statusBadge}
+                </div>
+                <div class="feedback-rating">${stars} (${feedback.rating}/5)</div>
+            </div>
+            <div class="feedback-content">
+                <div class="feedback-info">
+                    <div><strong>Citizen:</strong> ${user.name} (${user.email})</div>
+                    <div><strong>Location:</strong> ${grievance.location}</div>
+                    <div><strong>Category:</strong> ${grievance.category}</div>
+                    <div><strong>Resolved:</strong> ${formatDate(grievance.resolvedAt)}</div>
+                    <div><strong>Feedback Date:</strong> ${formatDate(feedback.createdAt)}</div>
+                </div>
+                ${feedback.comments ? `
+                    <div class="feedback-comments">
+                        <strong>Comments:</strong>
+                        <p>${feedback.comments}</p>
+                    </div>
+                ` : ''}
+            </div>
+            ${isReopened ? `
+                <div class="reopened-notice">
+                    ⚠️ This complaint was reopened by the citizen due to dissatisfaction
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+/**
+ * Display pending feedback
+ */
+function displayPendingFeedback() {
+    const container = document.getElementById('pendingFeedbackList');
+    if (!container) return;
+    
+    if (pendingFeedback.length === 0) {
+        container.innerHTML = '<div class="empty-state">✅ All resolved complaints have feedback!</div>';
+        return;
+    }
+    
+    container.innerHTML = pendingFeedback.map(item => createPendingFeedbackCard(item)).join('');
+}
+
+/**
+ * Create pending feedback card
+ */
+function createPendingFeedbackCard(item) {
+    const user = item.user || {};
+    
+    return `
+        <div class="pending-feedback-card">
+            <div class="pending-header">
+                <strong>Grievance #${item.grievanceId}</strong> - ${item.title || item.category}
+                <span class="badge badge-warning">⏳ WAITING FOR FEEDBACK</span>
+            </div>
+            <div class="pending-info">
+                <div><strong>Citizen:</strong> ${user.name} (${user.email})</div>
+                <div><strong>Location:</strong> ${item.location}</div>
+                <div><strong>Category:</strong> ${item.category}</div>
+                <div><strong>Resolved:</strong> ${formatDate(item.resolvedAt)}</div>
+            </div>
+            <div class="pending-notice">
+                📢 Citizen has not yet provided feedback on this resolved complaint
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Display reopened complaints
+ */
+function displayReopenedComplaints() {
+    const container = document.getElementById('reopenedComplaintsList');
+    if (!container) return;
+    
+    if (reopenedComplaints.length === 0) {
+        container.innerHTML = '<div class="empty-state">✅ No complaints have been reopened</div>';
+        return;
+    }
+    
+    container.innerHTML = reopenedComplaints.map(feedback => createReopenedCard(feedback)).join('');
+}
+
+/**
+ * Create reopened complaint card
+ */
+function createReopenedCard(feedback) {
+    const stars = '⭐'.repeat(feedback.rating || 0);
+    const grievance = feedback.grievance || {};
+    const user = feedback.user || {};
+    
+    return `
+        <div class="reopened-complaint-card">
+            <div class="reopened-header">
+                <div>
+                    <strong>Grievance #${grievance.id}</strong> - ${grievance.title || grievance.category}
+                    <span class="badge badge-danger">🔄 REOPENED</span>
+                </div>
+                <div class="feedback-rating">${stars} (${feedback.rating}/5)</div>
+            </div>
+            <div class="reopened-content">
+                <div class="reopened-info">
+                    <div><strong>Citizen:</strong> ${user.name} (${user.email})</div>
+                    <div><strong>Location:</strong> ${grievance.location}</div>
+                    <div><strong>Category:</strong> ${grievance.category}</div>
+                    <div><strong>Originally Resolved:</strong> ${formatDate(grievance.resolvedAt)}</div>
+                    <div><strong>Reopened On:</strong> ${formatDate(feedback.createdAt)}</div>
+                </div>
+                ${feedback.comments ? `
+                    <div class="reopened-reason">
+                        <strong>Reason for Reopening:</strong>
+                        <p>${feedback.comments}</p>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="action-required-notice">
+                ⚠️ ACTION REQUIRED: This complaint needs to be reassigned and resolved again
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Display rating distribution
+ */
+function displayRatingDistribution(distribution) {
+    const container = document.getElementById('ratingDistribution');
+    if (!container) return;
+    
+    if (!distribution || Object.keys(distribution).length === 0) {
+        container.innerHTML = '<p style="text-align: center; padding: 20px;">No ratings yet</p>';
+        return;
+    }
+    
+    // Calculate total
+    const total = Object.values(distribution).reduce((sum, count) => sum + count, 0);
+    
+    // Create bars
+    let html = '<div class="rating-bars">';
+    
+    for (let rating = 5; rating >= 1; rating--) {
+        const count = distribution[rating] || 0;
+        const percentage = total > 0 ? (count / total * 100).toFixed(1) : 0;
+        const stars = '⭐'.repeat(rating);
+        
+        html += `
+            <div class="rating-bar-item">
+                <div class="rating-label">${stars}</div>
+                <div class="rating-bar-container">
+                    <div class="rating-bar-fill" style="width: ${percentage}%"></div>
+                </div>
+                <div class="rating-count">${count} (${percentage}%)</div>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/**
+ * Setup feedback tabs
+ */
+function setupFeedbackTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+            
+            // Remove active class from all
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class
+            this.classList.add('active');
+            document.getElementById(tabName)?.classList.add('active');
+        });
+    });
+}
+
+/**
+ * Setup feedback filters
+ */
+function setupFeedbackFilters() {
+    document.getElementById('feedbackSearch')?.addEventListener('input', filterAllFeedback);
+    document.getElementById('feedbackRatingFilter')?.addEventListener('change', filterAllFeedback);
+}
+
+/**
+ * Filter all feedback
+ */
+function filterAllFeedback() {
+    const searchTerm = document.getElementById('feedbackSearch')?.value.toLowerCase() || '';
+    const ratingFilter = document.getElementById('feedbackRatingFilter')?.value || 'all';
+    
+    let filtered = allFeedback;
+    
+    // Apply search filter
+    if (searchTerm) {
+        filtered = filtered.filter(f => {
+            const grievance = f.grievance || {};
+            const user = f.user || {};
+            return (
+                grievance.id?.toString().includes(searchTerm) ||
+                user.name?.toLowerCase().includes(searchTerm) ||
+                user.email?.toLowerCase().includes(searchTerm) ||
+                grievance.category?.toLowerCase().includes(searchTerm)
+            );
+        });
+    }
+    
+    // Apply rating filter
+    if (ratingFilter !== 'all') {
+        filtered = filtered.filter(f => f.rating === parseInt(ratingFilter));
+    }
+    
+    // Display filtered results
+    const container = document.getElementById('allFeedbackList');
+    if (!container) return;
+    
+    if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state">No feedback matches your filters</div>';
+    } else {
+        container.innerHTML = filtered.map(feedback => createFeedbackCard(feedback)).join('');
+    }
+}
+
+// ========================================
+// LOAD ANALYTICS DATA
+// ========================================
+async function loadAnalyticsData() {
+    const token = localStorage.getItem('token');
+    
+    try {
+        console.log('📊 Loading analytics...');
+        
+        const response = await fetch(`${API_URL}/analytics/dashboard`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to load analytics');
+        }
+        
+        const data = await response.json();
+        console.log('✅ Analytics loaded:', data);
+        
+        // Update metrics
+        document.getElementById('avgResponseTime').textContent = 
+            data.averageResolutionTime ? `${data.averageResolutionTime.toFixed(1)} days` : 'N/A';
+        
+        document.getElementById('avgResTime').textContent = 
+            data.averageResolutionTime ? `${data.averageResolutionTime.toFixed(1)} days` : 'N/A';
+        
+        // Create category chart
+        if (data.categoryDistribution && data.categoryDistribution.length > 0) {
+            createCategoryChart(data.categoryDistribution);
+        }
+        
+        // Display department performance
+        if (data.slaPerformance) {
+            displayDepartmentPerformance(data.slaPerformance);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading analytics:', error);
+    }
+}
+
+function createCategoryChart(categories) {
+    console.log('📊 Creating category chart with data:', categories);
+    
+    const canvas = document.getElementById('categoryChart');
+    if (!canvas) {
+        console.error('❌ Canvas element not found!');
+        return;
+    }
+    
+    // Check if Chart.js loaded
+    if (typeof Chart === 'undefined') {
+        console.error('❌ Chart.js library not loaded!');
+        return;
+    }
+    
+    // Destroy existing chart if any
+    if (window.categoryChartInstance) {
+        window.categoryChartInstance.destroy();
+    }
+    
+    // Create chart
+    window.categoryChartInstance = new Chart(canvas, {
+        type: 'pie',
+        data: {
+            labels: categories.map(c => c.category),
+            datasets: [{
+                data: categories.map(c => c.count),
+                backgroundColor: [
+                    '#3b82f6', '#10b981', '#f59e0b', 
+                    '#ef4444', '#8b5cf6', '#ec4899'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    
+    console.log('✅ Chart created successfully!');
+}
+
+function displayDepartmentPerformance(slaData) {
+    const container = document.getElementById('departmentPerformance');
+    if (!container) return;
+    
+    if (!slaData || slaData.length === 0) {
+        container.innerHTML = '<p>No data available</p>';
+        return;
+    }
+    
+    container.innerHTML = slaData.map(dept => `
+        <div class="metric-item">
+            <span>${dept.category}</span>
+            <strong>${dept.complianceRate.toFixed(0)}% SLA</strong>
+        </div>
+    `).join('');
+}
+
+
+
+// Initialize feedback management when section becomes active
+console.log('✅ Feedback Management Module Loaded!');

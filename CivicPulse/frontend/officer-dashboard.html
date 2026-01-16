@@ -219,43 +219,46 @@
                 </div>
             </section>
 
-            <!-- My Workload Section -->
-            <section id="workload-section" class="content-section">
-                <div class="section-title">
-                    <h2>📈 My Workload Analytics</h2>
-                    <p>Track your performance and productivity</p>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h4>This Week</h4>
-                        <h3 id="weeklyResolved">0</h3>
-                        <p>Issues Resolved</p>
-                    </div>
-                    <div class="stat-card">
-                        <h4>This Month</h4>
-                        <h3 id="monthlyResolved">0</h3>
-                        <p>Issues Resolved</p>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Average Time</h4>
-                        <h3 id="avgResolutionTime">0</h3>
-                        <p>Days to Resolve</p>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Success Rate</h4>
-                        <h3 id="successRate">0%</h3>
-                        <p>Resolution Rate</p>
-                    </div>
-                </div>
-                
-                <div class="performance-chart">
-                    <h3>Performance Trends</h3>
-                    <div id="performanceChart" class="chart-placeholder">
-                        <p>📊 Chart visualization would go here</p>
-                    </div>
-                </div>
-            </section>
+           <!-- My Workload Section -->
+<section id="workload-section" class="content-section">
+    <div class="section-title">
+        <h2>📈 My Workload Analytics</h2>
+        <p>Track your performance and productivity</p>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h4>This Week</h4>
+            <h3 id="weeklyResolved">0</h3>
+            <p>Issues Resolved</p>
+        </div>
+        <div class="stat-card">
+            <h4>This Month</h4>
+            <h3 id="monthlyResolved">0</h3>
+            <p>Issues Resolved</p>
+        </div>
+        <div class="stat-card">
+            <h4>Average Time</h4>
+            <h3 id="avgResolutionTime">0</h3>
+            <p>Days to Resolve</p>
+        </div>
+        <div class="stat-card">
+            <h4>Success Rate</h4>
+            <h3 id="successRate">0%</h3>
+            <p>Resolution Rate</p>
+        </div>
+    </div>
+    
+    <!-- ✅ ZONE-LEVEL ANALYTICS -->
+    <div id="zoneStats" class="zone-analytics-container"></div>
+    
+    <div class="performance-chart">
+        <h3>Performance Trends</h3>
+        <div id="performanceChart" class="chart-placeholder">
+            <p>📊 Your resolved: <strong id="yourResolvedCount">2</strong> out of <strong id="zoneResolvedCount">2</strong> in zone</p>
+        </div>
+    </div>
+</section>
 
             <!-- Profile Section -->
             <section id="profile-section" class="content-section">
