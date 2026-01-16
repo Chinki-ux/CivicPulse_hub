@@ -1,4 +1,4 @@
-package com.civicrules.model;
+  package com.civicrules.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

@@ -1,5 +1,4 @@
 package com.civicrules.controller;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import com.civicrules.model.Grievance;
 import com.civicrules.model.Officer;
@@ -20,11 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/grievances")
@@ -250,8 +245,6 @@ public class GrievanceController {
     public ResponseEntity<?> getAllGrievances() {
         try {
             List<Grievance> grievances = grievanceRepository.findByOrderByCreatedAtDesc();
-
-            // Convert to simplified DTOs
             List<Map<String, Object>> result = new ArrayList<>();
 
             for (Grievance g : grievances) {
@@ -259,25 +252,27 @@ public class GrievanceController {
                 dto.put("id", g.getId());
                 dto.put("title", g.getTitle());
                 dto.put("category", g.getCategory());
-                dto.put("location", g.getLocation());
                 dto.put("description", g.getDescription());
-                dto.put("status", g.getStatus().toString());
-                dto.put("imagePath", g.getImagePath());
+                dto.put("location", g.getLocation());
+                dto.put("status", g.getStatus());
                 dto.put("createdAt", g.getCreatedAt());
-                dto.put("department", g.getDepartment());
+                dto.put("imagePath", g.getImagePath());
                 dto.put("verificationStatus", g.getVerificationStatus());
                 dto.put("rejectionReason", g.getRejectionReason());
 
-                // Add user info safely
+                // ✅ ADD FEEDBACK FIELDS
+                dto.put("feedbackSubmitted", g.getFeedbackSubmitted());
+                dto.put("reopenReason", g.getReopenReason());
+
+                // Add user info
                 if (g.getUser() != null) {
                     Map<String, Object> userInfo = new HashMap<>();
                     userInfo.put("id", g.getUser().getId());
                     userInfo.put("name", g.getUser().getFullName());
-                    userInfo.put("email", g.getUser().getEmail());
                     dto.put("user", userInfo);
                 }
 
-                // Add assigned officer info safely
+                // Add assigned officer info
                 if (g.getAssignedTo() != null) {
                     Map<String, Object> officerInfo = new HashMap<>();
                     officerInfo.put("id", g.getAssignedTo().getId());
@@ -287,9 +282,7 @@ public class GrievanceController {
 
                 result.add(dto);
             }
-
             return ResponseEntity.ok(result);
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -466,21 +459,6 @@ public class GrievanceController {
     }
 
     /**
-     * Helper class for grievance statistics
-     */
-    static class GrievanceStats {
-        public long total;
-        public long pending;
-        public long resolved;
-
-        public GrievanceStats(long total, long pending, long resolved) {
-            this.total = total;
-            this.pending = pending;
-            this.resolved = resolved;
-        }
-    }
-
-    /**
      * ✅ Verify grievance endpoint
      */
     @PatchMapping("/{id}/verify")
@@ -557,7 +535,22 @@ public class GrievanceController {
     }
 
     /**
-     * ✅ Helper class
+     * Helper class for grievance statistics
+     */
+    static class GrievanceStats {
+        public long total;
+        public long pending;
+        public long resolved;
+
+        public GrievanceStats(long total, long pending, long resolved) {
+            this.total = total;
+            this.pending = pending;
+            this.resolved = resolved;
+        }
+    }
+
+    /**
+     * ✅ Helper class for verification request
      */
     static class VerificationRequest {
         private boolean approved;

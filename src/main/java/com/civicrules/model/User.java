@@ -48,6 +48,13 @@ public class User {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "zone")
+    private String zone; // For Officers: "North Delhi", "South Delhi", etc.
+
+    // Getter and Setter
+    public String getZone() { return zone; }
+    public void setZone(String zone) { this.zone = zone; }
+
     @UpdateTimestamp
     @Column
     private LocalDateTime updatedAt;

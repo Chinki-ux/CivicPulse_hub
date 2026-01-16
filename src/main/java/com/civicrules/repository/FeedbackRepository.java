@@ -22,6 +22,9 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     // Find all feedback where complaints were reopened
     List<Feedback> findByIsReopened(Boolean isReopened);
 
-    // Check if feedback exists for a grievance
+    // ✅ ADD THIS METHOD - Check if feedback exists for a grievance
     boolean existsByGrievanceId(Long grievanceId);
+
+    // Find all feedback ordered by creation date
+    List<Feedback> findAllByOrderByCreatedAtDesc();
 }

@@ -12,10 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/feedback")
@@ -30,6 +28,10 @@ public class FeedbackController {
 
     @Autowired
     private UserRepository userRepository;
+
+    // ========================================
+    // EXISTING ENDPOINTS (CITIZEN-FACING)
+    // ========================================
 
     /**
      * Submit feedback for a resolved grievance
@@ -175,7 +177,7 @@ public class FeedbackController {
     }
 
     /**
-     * Get all feedback (Admin only)
+     * Get all feedback (Admin only) - BASIC VERSION
      */
     @GetMapping
     public ResponseEntity<?> getAllFeedback() {
@@ -190,7 +192,152 @@ public class FeedbackController {
     }
 
     /**
-     * Get feedback statistics (Admin analytics)
+     * Delete feedback (Admin only)
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteFeedback(@PathVariable Long id) {
+        try {
+            feedbackRepository.deleteById(id);
+            return ResponseEntity.ok().body("Feedback deleted successfully");
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting feedback: " + e.getMessage());
+        }
+    }
+
+    // ========================================
+    // ✅ NEW: ADMIN-SPECIFIC ENDPOINTS
+    // ========================================
+
+    /**
+     * ✅ Get all feedback with grievance details (for Admin Dashboard)
+     */
+    @GetMapping("/admin/all")
+    public ResponseEntity<?> getAllFeedbackForAdmin() {
+        try {
+            List<Feedback> allFeedback = feedbackRepository.findAllByOrderByCreatedAtDesc();
+
+            List<Map<String, Object>> feedbackList = allFeedback.stream()
+                    .map(this::mapFeedbackToDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(feedbackList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching feedback: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ Get pending feedback (resolved complaints without feedback)
+     */
+    @GetMapping("/admin/pending")
+    public ResponseEntity<?> getPendingFeedback() {
+        try {
+            // Get all resolved grievances
+            List<Grievance> resolvedGrievances = grievanceRepository
+                    .findByStatus(Grievance.Status.RESOLVED);
+
+            // Filter those without feedback
+            List<Map<String, Object>> pendingList = resolvedGrievances.stream()
+                    .filter(g -> !feedbackRepository.existsByGrievanceId(g.getId()))
+                    .map(this::mapGrievanceToPendingFeedback)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(pendingList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching pending feedback: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ Get reopened complaints
+     */
+    @GetMapping("/admin/reopened")
+    public ResponseEntity<?> getReopenedComplaints() {
+        try {
+            List<Feedback> reopened = feedbackRepository.findByIsReopened(true);
+
+            List<Map<String, Object>> reopenedList = reopened.stream()
+                    .map(this::mapFeedbackToDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(reopenedList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching reopened complaints: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ Get feedback statistics for admin dashboard (ENHANCED VERSION)
+     */
+    @GetMapping("/admin/stats")
+    public ResponseEntity<?> getAdminFeedbackStats() {
+        try {
+            List<Feedback> allFeedback = feedbackRepository.findAll();
+            List<Grievance> resolvedGrievances = grievanceRepository
+                    .findByStatus(Grievance.Status.RESOLVED);
+
+            long totalResolved = resolvedGrievances.size();
+            long feedbackReceived = allFeedback.size();
+            long pendingFeedback = resolvedGrievances.stream()
+                    .filter(g -> !feedbackRepository.existsByGrievanceId(g.getId()))
+                    .count();
+            long reopenedCount = feedbackRepository.findByIsReopened(true).size();
+
+            // Calculate average rating
+            double avgRating = allFeedback.stream()
+                    .filter(f -> f.getRating() != null)
+                    .mapToInt(Feedback::getRating)
+                    .average()
+                    .orElse(0.0);
+
+            // Rating distribution
+            Map<Integer, Long> ratingDistribution = allFeedback.stream()
+                    .filter(f -> f.getRating() != null)
+                    .collect(Collectors.groupingBy(
+                            Feedback::getRating,
+                            Collectors.counting()
+                    ));
+
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("totalResolved", totalResolved);
+            stats.put("feedbackReceived", feedbackReceived);
+            stats.put("pendingFeedback", pendingFeedback);
+            stats.put("reopenedCount", reopenedCount);
+            stats.put("averageRating", Math.round(avgRating * 10.0) / 10.0);
+            stats.put("feedbackRate", totalResolved > 0 ?
+                    Math.round((double) feedbackReceived / totalResolved * 100) : 0);
+            stats.put("ratingDistribution", ratingDistribution);
+
+            // Also include basic stats for backwards compatibility
+            stats.put("totalFeedback", feedbackReceived);
+            stats.put("fiveStarCount", ratingDistribution.getOrDefault(5, 0L));
+            stats.put("fourStarCount", ratingDistribution.getOrDefault(4, 0L));
+            stats.put("threeStarCount", ratingDistribution.getOrDefault(3, 0L));
+            stats.put("twoStarCount", ratingDistribution.getOrDefault(2, 0L));
+            stats.put("oneStarCount", ratingDistribution.getOrDefault(1, 0L));
+
+            return ResponseEntity.ok(stats);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error calculating stats: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Original stats endpoint for backwards compatibility
      */
     @GetMapping("/stats")
     public ResponseEntity<?> getFeedbackStats() {
@@ -229,22 +376,78 @@ public class FeedbackController {
         }
     }
 
-    /**
-     * Delete feedback (Admin only)
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteFeedback(@PathVariable Long id) {
-        try {
-            feedbackRepository.deleteById(id);
-            return ResponseEntity.ok().body("Feedback deleted successfully");
+    // ========================================
+    // HELPER METHODS
+    // ========================================
 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error deleting feedback: " + e.getMessage());
+    /**
+     * Map Feedback to DTO with all details
+     */
+    private Map<String, Object> mapFeedbackToDTO(Feedback feedback) {
+        Map<String, Object> dto = new HashMap<>();
+
+        dto.put("id", feedback.getId());
+        dto.put("rating", feedback.getRating());
+        dto.put("comments", feedback.getComment()); // Using getComment() from your model
+        dto.put("isReopened", feedback.getIsReopened());
+        dto.put("createdAt", feedback.getCreatedAt());
+
+        // Grievance details
+        if (feedback.getGrievance() != null) {
+            Grievance g = feedback.getGrievance();
+            Map<String, Object> grievanceDto = new HashMap<>();
+            grievanceDto.put("id", g.getId());
+            grievanceDto.put("title", g.getTitle());
+            grievanceDto.put("category", g.getCategory());
+            grievanceDto.put("location", g.getLocation());
+            grievanceDto.put("status", g.getStatus().toString());
+            grievanceDto.put("resolvedAt", g.getResolvedAt());
+            dto.put("grievance", grievanceDto);
         }
+
+        // User details
+        if (feedback.getUser() != null) {
+            Map<String, Object> userDto = new HashMap<>();
+            userDto.put("id", feedback.getUser().getId());
+            userDto.put("name", feedback.getUser().getName());
+            userDto.put("email", feedback.getUser().getEmail());
+            dto.put("user", userDto);
+        }
+
+        return dto;
     }
 
-    // Helper class for request body
+    /**
+     * Map Grievance to Pending Feedback DTO
+     */
+    private Map<String, Object> mapGrievanceToPendingFeedback(Grievance g) {
+        Map<String, Object> dto = new HashMap<>();
+
+        dto.put("grievanceId", g.getId());
+        dto.put("title", g.getTitle());
+        dto.put("category", g.getCategory());
+        dto.put("location", g.getLocation());
+        dto.put("resolvedAt", g.getResolvedAt());
+        dto.put("status", "PENDING_FEEDBACK");
+
+        if (g.getUser() != null) {
+            Map<String, Object> userDto = new HashMap<>();
+            userDto.put("id", g.getUser().getId());
+            userDto.put("name", g.getUser().getName());
+            userDto.put("email", g.getUser().getEmail());
+            dto.put("user", userDto);
+        }
+
+        return dto;
+    }
+
+    // ========================================
+    // REQUEST DTOs
+    // ========================================
+
+    /**
+     * Request DTO for submitting feedback
+     */
     static class FeedbackRequest {
         private Long grievanceId;
         private Long userId;
